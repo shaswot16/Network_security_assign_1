@@ -44,7 +44,6 @@ int main()
         string command;
         cin >> command;
 
-
         if (command == "exit") {
             cout << "Closing connection..." << endl;
             break;
@@ -69,7 +68,6 @@ int main()
         }
     }
 
-    // Close the socket
     close(clientSocket);
     return 0;
 }
