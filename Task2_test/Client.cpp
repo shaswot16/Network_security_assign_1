@@ -42,7 +42,7 @@ void handle_peer(int peer_socket) {
             cerr << "Error sending message\n";
             break;
         }
-        if (message == "EOM") break;
+        if (message == "EOM") close(peer_socket);
     }
 
     close(peer_socket);
