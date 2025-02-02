@@ -28,17 +28,24 @@ void handle_client(int client_socket, struct sockaddr_in client_addr)
         close(client_socket);
         return;
     }
-
-    string username(buffer);
+    
+    //The message is sent like shaswot:1234 
+    string received_data(buffer);
     string client_ip = inet_ntoa(client_addr.sin_addr);
-    int client_port = ntohs(client_addr.sin_port);
+    size_t delimiter_pos = received_data.find(':');
+    if (delimiter_pos != string::npos)
+    {
+        string username = received_data.substr(0, delimiter_pos);
+        int client_port = std::stoi(received_data.substr(delimiter_pos + 1));
+        {
+            std::lock_guard<std::mutex> lock(clients_mutex);
+            clients[username] = {inet_ntoa(client_addr.sin_addr), client_port};
+        }
 
-    clients_mutex.lock();
-    clients[username] = {client_ip, client_port};
-    clients_mutex.unlock();
+        std::cout << username << " connected from " << inet_ntoa(client_addr.sin_addr)
+                  << ":" << client_port << std::endl;
+    }
 
-    // Print received username and client details
-    cout << "Received from " << username << " at " << client_ip << ":" << client_port << endl;
     while (true)
     {
         memset(buffer, 0, BUFFER_SIZE);
@@ -81,7 +88,6 @@ void handle_client(int client_socket, struct sockaddr_in client_addr)
         }
     }
 
-    // Close client connection
     close(client_socket);
 }
 
